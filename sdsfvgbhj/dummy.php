@@ -78,4 +78,7 @@ function handleDeleteRequest($path, $parameters) {
             break;
         default:
             http_response_code(404);
-            echo
+            echo json_encode(['error' => 'Endpoint not found']);
+    }
+}
+?>
