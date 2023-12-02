@@ -1,28 +1,28 @@
 <?php
 
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $parameters = $_GET;
 $headers = apache_request_headers();
-header_remove('X-Powered-By');
-header('Content-Type: application/json');
+header_remove("X-Powered-By");
+header("Content-Type: application/json");
 
 
-switch ($_SERVER['REQUEST_METHOD']) {
-    case 'GET':
+switch ($_SERVER["REQUEST_METHOD"]) {
+    case "GET":
         handleGetRequest($path, $parameters);
         break;
-    case 'POST':
+    case "POST":
         handlePostRequest($path, $parameters);
         break;
-    case 'PUT':
+    case "PUT":
         handlePutRequest($path, $parameters);
         break;
-    case 'DELETE':
+    case "DELETE":
         handleDeleteRequest($path, $parameters);
         break;
     default:
         http_response_code(405);
-        echo json_encode(['error' => 'Method not allowed'], JSON_PRETTY_PRINT);
+        echo json_encode(["error" => "Method not allowed"], JSON_PRETTY_PRINT);
 }
 
 // api.add_resource(ApiSpotifyAuthCode, "/api/spotify/auth/code")
@@ -36,51 +36,51 @@ switch ($_SERVER['REQUEST_METHOD']) {
 // api.add_resource(ApiGoogleRefreshToken, "/api/google/refresh/token")
 function handleGetRequest($path, $parameters) {
     switch ($path) {
-        case '/api/discord/auth/invite':
-            echo json_encode(['message' => 'GET request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/discord/auth/invite":
+            echo json_encode(["message" => "GET request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
             break;
-        case '/api/discord/auth/code':
-            echo json_encode(['message' => 'GET request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/discord/auth/code":
+            echo json_encode(["message" => "GET request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
             break;
         default:
             http_response_code(404);
-            echo json_encode(['error' => 'Endpoint not found'], JSON_PRETTY_PRINT);
+            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
     }
 }
 
 function handlePostRequest($path, $parameters) {
     switch ($path) {
-        case '/api/discord/auth/token':
-            echo json_encode(['message' => 'POST request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/discord/auth/token":
+            echo json_encode(["message" => "POST request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
             break;
-        case '/api/discord/refresh/token':
-                echo json_encode(['message' => 'POST request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/discord/refresh/token":
+                echo json_encode(["message" => "POST request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
                 break;
         default:
             http_response_code(404);
-            echo json_encode(['error' => 'Endpoint not found'], JSON_PRETTY_PRINT);
+            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
     }
 }
 
 function handlePutRequest($path, $parameters) {
     switch ($path) {
-        case '/api/user':
-            echo json_encode(['message' => 'PUT request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/user":
+            echo json_encode(["message" => "PUT request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
             break;
         default:
             http_response_code(404);
-            echo json_encode(['error' => 'Endpoint not found'], JSON_PRETTY_PRINT);
+            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
     }
 }
 
 function handleDeleteRequest($path, $parameters) {
     switch ($path) {
-        case '/api/user':
-            echo json_encode(['message' => 'DELETE request to /api/user', 'params' => $parameters], JSON_PRETTY_PRINT);
+        case "/api/user":
+            echo json_encode(["message" => "DELETE request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
             break;
         default:
             http_response_code(404);
-            echo json_encode(['error' => 'Endpoint not found'], JSON_PRETTY_PRINT);
+            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
     }
 }
 ?>
