@@ -1,86 +1,79 @@
 <?php
 
-$path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-$parameters = $_GET;
-$headers = apache_request_headers();
-header_remove("X-Powered-By");
-header("Content-Type: application/json");
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: *');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
+$method = $_SERVER['REQUEST_METHOD'];
+$request = $_SERVER['REQUEST_URI'];
 
-switch ($_SERVER["REQUEST_METHOD"]) {
-    case "GET":
-        handleGetRequest($path, $parameters);
+switch ($method) {
+    case 'GET':
+        if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)\/([\w@]+)/', $request, $matches)) {
+            $url = "http://stats.uptimerobot.com/api/getMonitor/{$matches[1]}?m={$matches[2]}";
+            $command = "curl -s -L {$url}";
+            $response = shell_exec($command);
+            if ($response != null) {
+                $new_response = json_decode($response, true);
+                if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
+                    http_response_code(200);
+                    header('Content-Type: application/json');
+                    echo json_encode($new_response);
+                } else {
+                    http_response_code(400);
+                    header('Content-Type: application/json');
+                    echo json_encode(['error' => 'Status error']);
+                };
+            } else {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['message' => 'Invalid request']);
+            };
+        } else if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)/', $request, $matches)) {
+            $url = "http://stats.uptimerobot.com/api/getMonitorList/{$matches[1]}";
+            $command = "curl -s -L {$url}";
+            $response = shell_exec($command);
+            if ($response != null) {
+                $new_response = json_decode($response, true);
+                if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
+                    http_response_code(200);
+                    header('Content-Type: application/json');
+                    echo json_encode($new_response);
+                } else {
+                    http_response_code(400);
+                    header('Content-Type: application/json');
+                    echo json_encode(['error' => 'Status error']);
+                };
+            } else {
+                http_response_code(400);
+                header('Content-Type: application/json');
+                echo json_encode(['message' => 'Invalid request']);
+            };
+        } else {
+            http_response_code(400);
+            header('Content-Type: application/json');
+            echo json_encode(['message' => 'Invalid request']);
+        };
         break;
-    case "POST":
-        handlePostRequest($path, $parameters);
+    case 'POST': 
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['message' => 'Invalid request']);
         break;
-    case "PUT":
-        handlePutRequest($path, $parameters);
+    case 'PUT':
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['message' => 'Invalid request']);
         break;
-    case "DELETE":
-        handleDeleteRequest($path, $parameters);
+    case 'DELETE':
+        http_response_code(400);
+        header('Content-Type: application/json');
+        echo json_encode(['message' => 'Invalid request']);
         break;
     default:
         http_response_code(405);
-        echo json_encode(["error" => "Method not allowed"], JSON_PRETTY_PRINT);
-}
-
-// api.add_resource(ApiSpotifyAuthCode, "/api/spotify/auth/code")
-// api.add_resource(ApiSpotifyAuthToken, "/api/spotify/auth/token")
-// api.add_resource(ApiSpotifyRefreshToken, "/api/spotify/refresh/token")
-// api.add_resource(ApiAmazonAuthCode, "/api/amazon/auth/code")
-// api.add_resource(ApiAmazonAuthToken, "/api/amazon/auth/token")
-// api.add_resource(ApiAmazonRefreshToken, "/api/amazon/refresh/token")
-// api.add_resource(ApiGoogleAuthCode, "/api/google/auth/code")
-// api.add_resource(ApiGoogleAuthToken, "/api/google/auth/token")
-// api.add_resource(ApiGoogleRefreshToken, "/api/google/refresh/token")
-function handleGetRequest($path, $parameters) {
-    switch ($path) {
-        case "/api/discord/auth/invite":
-            echo json_encode(["message" => "GET request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-            break;
-        case "/api/discord/auth/code":
-            echo json_encode(["message" => "GET request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-            break;
-        default:
-            http_response_code(404);
-            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
-    }
-}
-
-function handlePostRequest($path, $parameters) {
-    switch ($path) {
-        case "/api/discord/auth/token":
-            echo json_encode(["message" => "POST request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-            break;
-        case "/api/discord/refresh/token":
-                echo json_encode(["message" => "POST request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-                break;
-        default:
-            http_response_code(404);
-            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
-    }
-}
-
-function handlePutRequest($path, $parameters) {
-    switch ($path) {
-        case "/api/user":
-            echo json_encode(["message" => "PUT request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-            break;
-        default:
-            http_response_code(404);
-            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
-    }
-}
-
-function handleDeleteRequest($path, $parameters) {
-    switch ($path) {
-        case "/api/user":
-            echo json_encode(["message" => "DELETE request to /api/user", "params" => $parameters], JSON_PRETTY_PRINT);
-            break;
-        default:
-            http_response_code(404);
-            echo json_encode(["error" => "Endpoint not found"], JSON_PRETTY_PRINT);
-    }
-}
+        header('Content-Type: application/json');
+        echo json_encode(['message' => 'Method not allowed']);
+        break;
+};
 ?>
