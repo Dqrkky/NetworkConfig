@@ -34,4 +34,3 @@ while (true) {
     if (connection_aborted()) break;
     usleep(1000000);
 }
-?>
