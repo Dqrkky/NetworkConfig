@@ -3,7 +3,7 @@ class HandleMethod{
     public $config;
     public $functions;
 
-    public function __construct(String $method = null, array $parameters = null) {
+    public function __construct() {
         $this->config = array(
             "method" => strtolower($_SERVER["REQUEST_METHOD"]),
             "path" => isset($_SERVER["PATH_INFO"]) ? $_SERVER["PATH_INFO"] : '/',
@@ -11,11 +11,17 @@ class HandleMethod{
             "body" => file_get_contents("php://input"),
             "headers" => getallheaders(),
             "REQUEST_TIME_FLOAT" => $_SERVER["REQUEST_TIME_FLOAT"],
-            "ip" => $_SERVER['REMOTE_ADDR']
+            "ip" => $this->getIp()
         );
         $this->functions = array();
     }
 
+    public function getIp() {
+        return array(
+            "ipv4" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? $_SERVER['REMOTE_ADDR'] : null,
+            "ipv6" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? $_SERVER['REMOTE_ADDR'] : null
+        );
+    }
     public function register($name, $function) {
         $this->functions[$name] = $function;
     }

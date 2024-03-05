@@ -1,17 +1,17 @@
 <?php
 class Router {
     private $config = array();
-    public function __construct($ip = null) {
-        $this->config["ip"] = (isset($ip) && is_string($ip)) ? $ip : null;
-    }
-    public function getIp() {
-        return json_encode(
-            array(
-                "ip" => isset($this->config["ip"]) ? $this->config["ip"] : null
-            )
+    public function __construct($host = null) {
+        $this->config = array(
+            "host" => (isset($host) && is_string($host)) ? $host : null
         );
     }
-    public function devices() {
+    public function getIp() {
+        return array(
+            "host" => isset($this->config["host"]) ? $this->config["host"] : null
+        );
+    }
+    public function getDevices() {
         $config = array();
         for ($i=0; $i<5; $i++) {
             $config[] = array(
@@ -21,10 +21,6 @@ class Router {
                 "ip_address"=> ""
             );
         };
-        return json_encode(
-            $config
-        );
+        return $config;
     }
 }
-
-?> 

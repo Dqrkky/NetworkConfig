@@ -13,6 +13,12 @@ $handler->register("on_get", function (array $config) {
             http_response_code(200);
             echo json_encode($config, JSON_PRETTY_PRINT);
             break;
+        case '/api/getIp':
+            global $handler;
+            header("Content-Type: application/json");
+            http_response_code(200);
+            echo json_encode($handler->getIp(), JSON_PRETTY_PRINT);
+            break;
         default:
             header("Content-Type: application/json");
             http_response_code(405);
