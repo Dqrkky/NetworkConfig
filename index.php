@@ -22,16 +22,19 @@ switch ($request['method']) {
                 if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
                     http_response_code(200);
                     header('Content-Type: application/json');
-                    echo json_encode($new_response);
+                    echo json_encode($new_response, JSON_PRETTY_PRINT);
+                    break;
                 } else {
                     http_response_code(400);
                     header('Content-Type: application/json');
-                    echo json_encode(['error' => 'Status error']);
+                    echo json_encode(['error' => 'Status error'], JSON_PRETTY_PRINT);
+                    break;
                 };
             } else {
                 http_response_code(400);
                 header('Content-Type: application/json');
-                echo json_encode(['message' => 'Invalid request']);
+                echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
+                break;
             };
         } else if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)/', $request['path'], $matches)) {
             $url = "http://stats.uptimerobot.com/api/getMonitorList/{$matches[1]}";
@@ -42,27 +45,30 @@ switch ($request['method']) {
                 if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
                     http_response_code(200);
                     header('Content-Type: application/json');
-                    echo json_encode($new_response);
+                    echo json_encode($new_response, JSON_PRETTY_PRINT);
+                    break;
                 } else {
                     http_response_code(400);
                     header('Content-Type: application/json');
-                    echo json_encode(['error' => 'Status error']);
+                    echo json_encode(['error' => 'Status error'], JSON_PRETTY_PRINT);
+                    break;
                 };
             } else {
                 http_response_code(400);
                 header('Content-Type: application/json');
-                echo json_encode(['message' => 'Invalid request']);
+                echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
+                break;
             };
         } else {
             http_response_code(400);
             header('Content-Type: application/json');
-            echo json_encode(['message' => 'Invalid request']);
+            echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
+            break;
         };
-        break;
     default:
         http_response_code(405);
         header('Content-Type: application/json');
-        echo json_encode(['message' => 'Method not allowed']);
+        echo json_encode(['message' => 'Method not allowed'], JSON_PRETTY_PRINT);
         break;
 };
 ?>

@@ -9,11 +9,6 @@ $handler = new HandleMethod();
 $handler->register("on_get", function (array $config) {
     global $handler;
     switch($config["path"]) {
-        case '/api':
-            header("Content-Type: application/json");
-            http_response_code(200);
-            echo json_encode($config, JSON_PRETTY_PRINT);
-            break;
         case '/api/getIp':
             header("Content-Type: application/json");
             http_response_code(200);
