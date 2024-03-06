@@ -1,5 +1,5 @@
 <?php
-class HandleMethod{
+class HandleMethod {
     public $config;
     public $functions;
 
@@ -18,8 +18,14 @@ class HandleMethod{
 
     public function getIp() {
         return array(
-            "ipv4" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? $_SERVER['REMOTE_ADDR'] : null,
-            "ipv6" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? $_SERVER['REMOTE_ADDR'] : null
+            "ipv4" => array(
+                "ip" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? $_SERVER['REMOTE_ADDR'] : null,
+                "ipinfo" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) ? json_decode(file_get_contents("https://ipinfo.io/{$_SERVER['REMOTE_ADDR']}/json")) : null
+            ),
+            "ipv6" => array(
+                "ip" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? $_SERVER['REMOTE_ADDR'] : null,
+                "ipinfo" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? json_decode(file_get_contents("https://ipinfo.io/{$_SERVER['REMOTE_ADDR']}/json")) : null
+            )
         );
     }
     public function register($name, $function) {
