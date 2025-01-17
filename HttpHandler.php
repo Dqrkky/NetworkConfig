@@ -14,13 +14,35 @@ class HandleMethod {
             "ip" => $this->getIp()
         );
         $this->functions = array();
+        $this->config['device']= $this->parseUserAgent($this->config['headers']['User-Agent']);
     }
-
-    public function request(String $url = null) {
-        return file_get_contents($url);
+    public function request(String $url) {
+        return shell_exec("curl $url");
     }
-    public function ipinfo(String $ip = null) {
-        return $this->request("https://ipinfo.io/$ip");
+    public function ipinfo(String $ip) {
+        return json_decode($this->request("https://ipinfo.io/$ip"));
+    }
+    public function parseUserAgent($userAgentString) {
+        $pattern = '/\((.*?)\)/';
+        preg_match($pattern, $userAgentString, $matches);
+        if(isset($matches[1])) {
+            $data = explode(" ", str_replace(";", "", $matches[1]));
+            return array(
+                "os" => $data[0],
+                "version" => $data[1],
+                "version_number" => $data[2],
+                "system_type" => $data[3],
+                "architecture" => $data[4]
+            );
+        } else {
+            return array(
+                "os" => null,
+                "version" => null,
+                "version_number" => null,
+                "system_type" => null,
+                "architecture" => null
+            );
+        }
     }
     public function getIp() {
         return array(
@@ -33,6 +55,9 @@ class HandleMethod {
                 "ipinfo" => (isset($_SERVER['REMOTE_ADDR']) && filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) ? $this->ipinfo($_SERVER['REMOTE_ADDR']) : null
             )
         );
+    }
+    public function getDevice() {
+        return $this->config['device'];
     }
     public function register($name, $function) {
         $this->functions[$name] = $function;

@@ -1,74 +1,64 @@
 <?php
 
+include ("HttpHandler.php");
+
+$handler = new HandleMethod();
+
 header_remove("X-Powered-By");
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
-$request = array(
-    'method' => $_SERVER['REQUEST_METHOD'],
-    'path' => parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH),
-    'params' => $_GET
-);
+$handler->register('on_get',function($config) {
+    global $handler;
+    switch ($config['path']) {
+        case 'GET':
+            case '/api/getIp':
+                header("Content-Type: application/json");
+                http_response_code(200);
+                echo json_encode($handler->getIp(), JSON_PRETTY_PRINT);
+                break;
+            case '/api/getDevice':
+                header("Content-Type: application/json");
+                http_response_code(200);
+                echo json_encode($handler->getDevice(), JSON_PRETTY_PRINT);
+                break;
+            case '/api/test':
+                header("Content-Type: application/json");
+                http_response_code(200);
+                echo json_encode($handler->config, JSON_PRETTY_PRINT);
+                break;
+            default:
+                if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)\/([\w@]+)/', $config['path'], $matches)) {
+                    $url = "http://stats.uptimerobot.com/api/getMonitor/{$matches[1]}?m={$matches[2]}";
+                } else if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)/', $config['path'], $matches)) {
+                    $url = "http://stats.uptimerobot.com/api/getMonitorList/{$matches[1]}";
+                } else {
+                    $url = null;
+                };
+                if ($url) {
+                    $command = "curl -s -L {$url}";
+                    $response = shell_exec($command);
+                    http_response_code(200);
+                    header('Content-Type: application/json');
+                    echo $response;
+                    break;
+                } else {
+                    header("Content-Type: application/json");
+                    http_response_code(405);
+                    echo json_encode(array(
+                        "error" => "Path {$config["path"]} doesnt exist"    
+                    ), JSON_PRETTY_PRINT);
+                }
+    };
+});
 
-switch ($request['method']) {
-    case 'GET':
-        if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)\/([\w@]+)/', $request['path'], $matches)) {
-            $url = "http://stats.uptimerobot.com/api/getMonitor/{$matches[1]}?m={$matches[2]}";
-            $command = "curl -s -L {$url}";
-            $response = shell_exec($command);
-            if ($response != null) {
-                $new_response = json_decode($response, true);
-                if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
-                    http_response_code(200);
-                    header('Content-Type: application/json');
-                    echo json_encode($new_response, JSON_PRETTY_PRINT);
-                    break;
-                } else {
-                    http_response_code(400);
-                    header('Content-Type: application/json');
-                    echo json_encode(['error' => 'Status error'], JSON_PRETTY_PRINT);
-                    break;
-                };
-            } else {
-                http_response_code(400);
-                header('Content-Type: application/json');
-                echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
-                break;
-            };
-        } else if (preg_match('/\/api\/v1\/uptimerobot\/stats\/([\w@]+)/', $request['path'], $matches)) {
-            $url = "http://stats.uptimerobot.com/api/getMonitorList/{$matches[1]}";
-            $command = "curl -s -L {$url}";
-            $response = shell_exec($command);
-            if ($response != null) {
-                $new_response = json_decode($response, true);
-                if ($new_response && isset($new_response['status']) && $new_response['status'] == 'ok') {
-                    http_response_code(200);
-                    header('Content-Type: application/json');
-                    echo json_encode($new_response, JSON_PRETTY_PRINT);
-                    break;
-                } else {
-                    http_response_code(400);
-                    header('Content-Type: application/json');
-                    echo json_encode(['error' => 'Status error'], JSON_PRETTY_PRINT);
-                    break;
-                };
-            } else {
-                http_response_code(400);
-                header('Content-Type: application/json');
-                echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
-                break;
-            };
-        } else {
-            http_response_code(400);
-            header('Content-Type: application/json');
-            echo json_encode(['message' => 'Invalid request'], JSON_PRETTY_PRINT);
-            break;
-        };
-    default:
-        http_response_code(405);
-        header('Content-Type: application/json');
-        echo json_encode(['message' => 'Method not allowed'], JSON_PRETTY_PRINT);
-        break;
-};
-?>
+$handler->register("on_method_error", function (String $method) {
+    header("Content-Type: application/json");
+    http_response_code(405);
+    echo json_encode(array(
+        "error" => "Method $method not allowed"
+    ), JSON_PRETTY_PRINT);
+});
+
+$handler->run();
